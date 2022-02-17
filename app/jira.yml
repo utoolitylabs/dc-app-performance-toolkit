@@ -36,6 +36,7 @@ settings:
     view_backlog: 6
     browse_boards: 1
     standalone_extension: 0 # By default disabled
+    ifaws_connector_id: TODO-VALID-UUID  # Custom tests require a valid connecotr id, defined here for centralization
     # Custom dataset section.
     custom_dataset_query:          # Write JQL query to add JQL output to the app/datasets/jira/custom-issues.csv, e.g. "summary ~ 'AppIssue*'"
 services:

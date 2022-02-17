@@ -1,10 +1,11 @@
 import random
+import sys
 
 from selenium.webdriver.common.by import By
 
 from selenium_ui.base_page import BasePage
 from selenium_ui.conftest import print_timing
-from selenium_ui.jira.pages.pages import Login
+from selenium_ui.jira.pages.pages import Login, Dashboard
 from util.conf import JIRA_SETTINGS
 
 
@@ -32,13 +33,41 @@ def app_specific_action(webdriver, datasets):
     #     app_specific_user_login(username='admin', password='admin')
     # measure()
 
-    @print_timing("selenium_app_custom_action")
+    # @print_timing("selenium_app_custom_action")
+    # def measure():
+    #     @print_timing("selenium_app_custom_action:view_issue")
+    #     def sub_measure():
+    #         page.go_to_url(f"{JIRA_SETTINGS.server_url}/browse/{issue_key}")
+    #         page.wait_until_visible((By.ID, "summary-val"))  # Wait for summary field visible
+    #         page.wait_until_visible((By.ID, "ID_OF_YOUR_APP_SPECIFIC_UI_ELEMENT"))  # Wait for you app-specific UI element by ID selector
+    #     sub_measure()
+    # measure()
+    
+    dashboard_page = Dashboard(webdriver)
+
+    @print_timing("selenium_app_ui_connector_menu")
     def measure():
-        @print_timing("selenium_app_custom_action:view_issue")
-        def sub_measure():
-            page.go_to_url(f"{JIRA_SETTINGS.server_url}/browse/{issue_key}")
-            page.wait_until_visible((By.ID, "summary-val"))  # Wait for summary field visible
-            page.wait_until_visible((By.ID, "ID_OF_YOUR_APP_SPECIFIC_UI_ELEMENT"))  # Wait for you app-specific UI element by ID selector
-        sub_measure()
+        # NOTE: Kept extensive per line exception detection/logging in case we run into issues again, as it should not matter for normal test execution
+        try:
+            dashboard_page.go_to()
+        except Exception:
+            # https://docs.python.org/2/library/sys.html#sys.exc_info
+            exc_type, full_exception = sys.exc_info()[:2]
+            error_msg = f"Failed dashboard_page.go_to(): {exc_type.__name__}"
+            raise Exception(error_msg, full_exception)
+        try:
+            dashboard_page.wait_until_clickable((By.ID, "ifaws-aws-resources-link")).click()  # Wait for connector menu trigger
+        except Exception:
+            # https://docs.python.org/2/library/sys.html#sys.exc_info
+            exc_type, full_exception = sys.exc_info()[:2]
+            error_msg = f"Failed dashboard_page.wait_until_clickable(): {exc_type.__name__}"
+            raise Exception(error_msg, full_exception)
+        try:
+            dashboard_page.wait_until_visible((By.CSS_SELECTOR, "a[title='Go to AWS connector configuration page']"))  # Wait for connector menu visible
+        except Exception:
+            # https://docs.python.org/2/library/sys.html#sys.exc_info
+            exc_type, full_exception = sys.exc_info()[:2]
+            error_msg = f"Failed dashboard_page.wait_until_visible(): {exc_type.__name__}"
+            raise Exception(error_msg, full_exception)
     measure()
 
