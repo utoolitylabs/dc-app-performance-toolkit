@@ -80,7 +80,9 @@ class BambooClient(RestClient):
         :param start: The starting index of the returned users. Base index: 0.
         :param limit: The maximum number of users to return per page. Default: 25.
         """
-        request = self.get(f'{self.host}/rest/api/latest/admin/users?limit={limit}',
+        # NOTE/KLUDGE: Adding hardcoded start offset 1 to prevent on the fly creation of one additional user
+        # due to default query logic grabbing (and then dismissing) the admin user (relaying on admin being user 0 in test setup)
+        request = self.get(f'{self.host}/rest/api/latest/admin/users?start=1&limit={limit}',
                            error_msg="Can not retrieve users")
         content = request.json()
         return content['results']
