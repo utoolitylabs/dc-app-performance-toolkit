@@ -1,18 +1,21 @@
 package bamboogenerator.service.generator.plan;
 
 import bamboogenerator.model.PlanInfo;
+import com.atlassian.bamboo.specs.api.builders.AtlassianModule;
 import com.atlassian.bamboo.specs.api.builders.Variable;
 import com.atlassian.bamboo.specs.api.builders.plan.Job;
 import com.atlassian.bamboo.specs.api.builders.plan.Plan;
 import com.atlassian.bamboo.specs.api.builders.plan.Stage;
 import com.atlassian.bamboo.specs.api.builders.plan.artifact.Artifact;
 import com.atlassian.bamboo.specs.api.builders.project.Project;
+import com.atlassian.bamboo.specs.api.builders.task.AnyTask;
 import com.atlassian.bamboo.specs.builders.repository.git.GitRepository;
 import com.atlassian.bamboo.specs.builders.task.CheckoutItem;
 import com.atlassian.bamboo.specs.builders.task.ScriptTask;
 import com.atlassian.bamboo.specs.builders.task.TestParserTask;
 import com.atlassian.bamboo.specs.builders.task.VcsCheckoutTask;
 import com.atlassian.bamboo.specs.model.task.TestParserTaskProperties;
+import com.atlassian.bamboo.specs.util.MapBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +61,21 @@ public class PlanGenerator {
                                                 .interpreterBinSh()
                                                 .inlineBody(isFailedPlan
                                                         ? String.format(BODY_FAIL, TEST_COUNT, TEST_COUNT, TEST_COUNT)
-                                                        : String.format(BODY_SUCCESS, TEST_COUNT, TEST_COUNT))
+                                                        : String.format(BODY_SUCCESS, TEST_COUNT, TEST_COUNT)),
+                                        new AnyTask(new AtlassianModule("net.utoolity.atlassian.bamboo.identity-federation-for-aws-bamboo:aws.sts.credentialsvariables"))
+                                                .description("Create temporary credentials variables")
+                                                .configuration(new MapBuilder()
+                                                        .put("variableNamespace", "custom.aws")
+                                                        .put("pluginConfigVersionOnSave", "1")
+                                                        .put("addCallerIdentityVariables", "true")
+                                                        .put("awsIamRoleAgentsArn", "")
+                                                        .put("pluginVersionOnSave", "2.15.1")
+                                                        .put("awsCredentialsSource", "IFAWS_CONNECTOR")
+                                                        .put("awsConnectorIdVariable", "${bamboo.awsDefaultConnector}")
+                                                        .put("awsConnectorId", "AWS_CONNECTOR_VARIABLE_KEY")
+                                                        .put("variableScope", "LOCAL")
+                                                        .build()
+                                                )
                                 )
                                 .finalTasks(new TestParserTask(TestParserTaskProperties.TestType.JUNIT)
                                         .description("Unit test results parser task")
