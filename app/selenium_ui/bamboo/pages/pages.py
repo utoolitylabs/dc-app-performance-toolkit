@@ -18,6 +18,7 @@ class Login(BasePage):
 
 
 class ProjectList(BasePage):
+    page_url = AllProjectsLocators.view_all_projects_url
     page_loaded_selector = [AllProjectsLocators.project_table, AllProjectsLocators.project_name_column]
 
     def click_projects_button(self):
