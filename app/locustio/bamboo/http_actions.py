@@ -91,7 +91,10 @@ def run_build_plans(locust):
     time.sleep(sleep_time)
 
 
-@bamboo_measure('locust_bamboo_login')
+# NOTE: Commented bamboo_measure here, as it introduces the 'action wait time' logic for the login,
+# which for custom tests is not an action in itself, and the wait time is ridiculously high for
+# the base concurrency and transaction per hour number set for Bamboo
+# @bamboo_measure('locust_bamboo_login')
 def locust_bamboo_login(locust):
     session_id = str(uuid.uuid4())
     locust.cross_action_storage[session_id] = dict()
