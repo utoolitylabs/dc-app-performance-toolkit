@@ -1,5 +1,5 @@
 from locust import HttpUser, task, between
-from extension.bamboo.extension_locust import app_specific_action
+from extension.bamboo.extension_locust import app_specific_action_get_temporary_credential, app_specific_action_get_ecr_credential
 from locustio.bamboo.http_actions import locust_bamboo_login
 from locustio.common_utils import LocustConfig, MyBaseTaskSet
 from util.conf import BAMBOO_SETTINGS
@@ -14,8 +14,12 @@ class BambooBehavior(MyBaseTaskSet):
         locust_bamboo_login(self)
 
     @task(config.percentage('standalone_extension_locust'))
-    def custom_action(self):
-        app_specific_action(self)
+    def custom_action_get_temporary_credential(self):
+        app_specific_action_get_temporary_credential(self)
+
+    @task(config.percentage('standalone_extension_locust'))
+    def custom_action_get_ecr_credential(self):
+        app_specific_action_get_ecr_credential(self)
 
 
 class BambooUser(HttpUser):
