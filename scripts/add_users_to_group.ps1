@@ -7,16 +7,24 @@ param (
 
 $sessionName = [guid]::NewGuid().toString()
 $currentUserEndpoint = $targetBaseUrl + "/rest/api/latest/currentUser"
-$getUsersEndpoint = $targetBaseUrl + "/rest/api/latest/admin/users?start=1&limit=2010"
+$getUsersEndpoint = $targetBaseUrl + "/rest/api/latest/admin/users"
 $addUsersEndpoint = $targetBaseUrl + "/rest/api/latest/admin/groups/performance-user/add-users"
 
 # Prime the session
 $auth = $user + ":" + $pass
 http --auth $auth --session=$sessionName GET $currentUserEndpoint
 
-$getUsersResponse = http --session=$sessionName --json GET $getUsersEndpoint
-$namesOnlyArray = $getUsersResponse | jq '[.results[] | {name} | .name]'
-Write-Output $namesOnlyArray
-
-$addToGroupResponse = Write-Output $namesOnlyArray | http --session=$sessionName POST $addUsersEndpoint
-Write-Output $addToGroupResponse
+# Grab users and put them into groups in chunks to prevent hibernate constraint violations (presumed overload)
+$chunkSize = 32
+$assumedCout = 2010
+$iterations = [int][Math]::Ceiling($assumedCout / $chunkSize)
+$currentIndex = 0 # includes the admin, no harm in him being in the groups as well
+foreach($i in 1..$iterations) {
+    Write-Output "Iteration: $i / $iterations"
+    $requestUrl = $getUsersEndpoint + "?start=" + $currentIndex + "&limit=" + $chunkSize
+    $getUsersResponse = http --session=$sessionName --json GET $requestUrl
+    $namesOnlyArray = $getUsersResponse | jq '[.results[] | {name} | .name]'
+    Write-Output $namesOnlyArray
+    Write-Output $namesOnlyArray | http --session=$sessionName POST $addUsersEndpoint
+    $currentIndex = $currentIndex + $chunkSize
+}
