@@ -28,7 +28,7 @@ settings:
     view_job_configuration: 10
     view_build_summary: 10
     view_projects_list: 10
-    standalone_extension: 1            # Standalone extension weight for JMeter. By default, disabled. Set appropriate weight to enable.
+    standalone_extension: 0            # Standalone extension weight for JMeter. By default, disabled. Set appropriate weight to enable.
     # Locust app specific
     standalone_extension_locust: 1     # Standalone extension weight for Locust. By default, disabled. Set 1 to enable.
     ifaws_connector_id: TODO-VALID-UUID  # Custom tests require a valid connecotr id, defined here for centralization
