@@ -1,8 +1,9 @@
 import re
 from locustio.common_utils import init_logger, bamboo_measure, run_as_specific_user  # noqa F401
+from util.conf import BAMBOO_SETTINGS
 
 logger = init_logger(app_type='bamboo')
-FIRST_CONNECTOR = "53f911b5-3613-42cf-8d5f-ef9535051673"
+FIRST_CONNECTOR = BAMBOO_SETTINGS.ifaws_connector_id
 
 # NOTE: Quite a deviation from the original sample, but that would not cater for multiple custom actions without changes to dc toolkit core logic,
 # hence starting with on custom action invoking multiple measurements in itself (to be revised if results are not satisfactory)
