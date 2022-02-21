@@ -25,7 +25,7 @@ def app_specific_action_get_ecr_credential(locust):
 
     userName = locust.session_data_storage["username"]
     logger.info(f"'get_ecr_credentials() called for user {userName} ...")
-    path = "/rest/identity-federation-for-aws/2.2/connectors/" + FIRST_CONNECTOR + "/credentials"
+    path = "/rest/identity-federation-for-aws/2.2/connectors/" + FIRST_CONNECTOR + "/ecr/credentials"
     r = locust.get(path, catch_response=True)  # call app-specific GET endpoint
     logger.info(f"'... locust.get() returned status code {r.status_code} ...")
     
