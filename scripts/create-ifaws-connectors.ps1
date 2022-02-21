@@ -1,5 +1,5 @@
 param (
-    [string]$targetBaseUrl = "https://bamboo.ifaws-1573-20220216-1.tst.utoolity.net",
+    [string]$targetBaseUrl = "https://bamboo.ifaws-1573-20220221-1.tst.utoolity.net",
     [Parameter(Mandatory = $true)][string]$accessKeyId,
     [string]$secretAccessKey = $( Read-Host "Enter secretAccessKey" ),
     [int]$numAccounts = 10,
@@ -9,9 +9,9 @@ param (
     [string]$user = "admin",
     [string]$pass = $( Read-Host "Enter host instance password" )
 )
-$accountsEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.1/accounts?skipValidation=true"
-$connectorsEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.1/connectors"
-$statusEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.1/status/info"
+$accountsEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.2/accounts?skipValidation=true"
+$connectorsEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.2/connectors"
+$statusEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.2/status/info"
 $sessionName = [guid]::NewGuid().toString()
 
 # Prime the session
@@ -54,7 +54,7 @@ $connectorTemplate = @"
     "accountId": "ACCOUNT_ID_TBR",
     "roleArn": "arn:aws:iam::288727192237:role/ifaws-quickstart-uaa-453-IdentityFederationForAWS-1L84NAN9NUAYQ",
     "externalId": "",
-    "iamPolicy": "{\r\n  \"Statement\": [\r\n    {\r\n      \"Effect\": \"Allow\",\r\n      \"Action\": \"*\",\r\n      \"Resource\": \"*\"\r\n    }\r\n  ]\r\n}",
+    "iamPolicy": "",
     "groups": [
         "performance-user"
     ]
