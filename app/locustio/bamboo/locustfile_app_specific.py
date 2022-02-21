@@ -15,10 +15,22 @@ class BambooBehavior(MyBaseTaskSet):
 
     @task(config.percentage('standalone_extension_locust'))
     def custom_action_get_temporary_credential(self):
+        # KLUDGE: The terraform based Bamboo setup uses the default 30min session timeout,
+        # and the locust instrumentation of the toolkit does not cater for the thus unavoidable 403/401 responses
+        # starting after 30min - this should be fixed either in the Bamboo test instance itself,
+        # or by improved login/-out handling in the toolkit, but to get test results for now,
+        # we accept the overhead of a dedicated login per custom action REST call
+        locust_bamboo_login(self)
         app_specific_action_get_temporary_credential(self)
 
     @task(config.percentage('standalone_extension_locust'))
     def custom_action_get_ecr_credential(self):
+        # KLUDGE: The terraform based Bamboo setup uses the default 30min session timeout,
+        # and the locust instrumentation of the toolkit does not cater for the thus unavoidable 403/401 responses
+        # starting after 30min - this should be fixed either in the Bamboo test instance itself,
+        # or by improved login/-out handling in the toolkit, but to get test results for now,
+        # we accept the overhead of a dedicated login per custom action REST call
+        locust_bamboo_login(self)
         app_specific_action_get_ecr_credential(self)
 
 
