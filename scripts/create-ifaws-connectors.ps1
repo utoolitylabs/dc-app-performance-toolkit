@@ -1,13 +1,13 @@
 param (
-    [string]$targetBaseUrl = "https://bamboo.ifaws-1573-20220221-1.tst.utoolity.net",
-    [Parameter(Mandatory = $true)][string]$accessKeyId,
-    [string]$secretAccessKey = $( Read-Host "Enter secretAccessKey" ),
-    [int]$numAccounts = 10,
-    [int]$numConnectors = 100,
+    [string]$targetBaseUrl = "https://bamboo.ifaws-1573-20220223-1.tst.utoolity.net",
+    [Parameter(Mandatory,HelpMessage='accessKeyId')][string]$accessKeyId,
+    [Parameter(Mandatory,HelpMessage='secretAccessKey')][string]$secretAccessKey,
+    [Parameter(Mandatory,HelpMessage='numAccounts')][int]$numAccounts,
+    [Parameter(Mandatory,HelpMessage='numConnectors')][int]$numConnectors,
     [string]$accountBaseName = "TestAccount-",
     [string]$connectorBaseName = "TestConnector-",
     [string]$user = "admin",
-    [string]$pass = $( Read-Host "Enter host instance password" )
+    [Parameter(Mandatory,HelpMessage='Enter host instance password')][string]$pass
 )
 $accountsEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.2/accounts?skipValidation=true"
 $connectorsEndpoint = $targetBaseUrl + "/rest/identity-federation-for-aws/2.2/connectors"
