@@ -52,7 +52,7 @@ $connectorTemplate = @"
     "scope": "SYSTEM",
     "partition": "aws",
     "accountId": "ACCOUNT_ID_TBR",
-    "roleArn": "arn:aws:iam::288727192237:role/ifaws-quickstart-uaa-453-IdentityFederationForAWS-1L84NAN9NUAYQ",
+    "roleArn": "arn:aws:iam::288727192237:role/aaws-quickstart-uaa-459-1-AutomationWithAWSCoreRol-4PDHYQ9SSNBL",
     "externalId": "",
     "iamPolicy": "",
     "groups": [
