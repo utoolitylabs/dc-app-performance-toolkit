@@ -1,29 +1,35 @@
 import re
+from app.locustio.common_utils import raise_if_login_failed
 from locustio.common_utils import init_logger, jira_measure, run_as_specific_user  # noqa F401
+from util.conf import JIRA_SETTINGS
 
 logger = init_logger(app_type='jira')
+FIRST_CONNECTOR = JIRA_SETTINGS.ifaws_connector_id
 
+# NOTE: Quite a deviation from the original sample, but that would not cater for multiple custom actions without changes to dc toolkit core logic,
+# hence starting with on custom action invoking multiple measurements in itself (to be revised if results are not satisfactory)
+# @run_as_specific_user(username='admin', password='admin')
+@jira_measure("locust_app_api_get_temporary_credentials")
+def app_specific_action_get_temporary_credential(locust):
+    raise_if_login_failed(locust)
+    
+    userName = locust.session_data_storage["username"]
+    logger.info(f"'get_temporary_credentials() called for user {userName} ...")
+    path = "/rest/identity-federation-for-aws/2.2/connectors/" + FIRST_CONNECTOR + "/credentials"
+    r = locust.get(path, catch_response=True)  # call app-specific GET endpoint
+    logger.info(f"'... locust.get() returned status code {r.status_code} ...")
+    
+    assert r.status_code == 200, f"expected GET .../credentials 200, got {r.status_code}"
+    
+    
+@jira_measure("locust_app_api_get_ecr_credentials")
+def app_specific_action_get_ecr_credential(locust):
+    raise_if_login_failed(locust)
 
-@jira_measure("locust_app_specific_action")
-# @run_as_specific_user(username='admin', password='admin')  # run as specific user
-def app_specific_action(locust):
-    r = locust.get('/app/get_endpoint', catch_response=True)  # call app-specific GET endpoint
-    content = r.content.decode('utf-8')   # decode response content
-
-    token_pattern_example = '"token":"(.+?)"'
-    id_pattern_example = '"id":"(.+?)"'
-    token = re.findall(token_pattern_example, content)  # get TOKEN from response using regexp
-    id = re.findall(id_pattern_example, content)    # get ID from response using regexp
-
-    logger.locust_info(f'token: {token}, id: {id}')  # log info for debug when verbose is true in jira.yml file
-    if 'assertion string' not in content:
-        logger.error(f"'assertion string' was not found in {content}")
-    assert 'assertion string' in content  # assert specific string in response content
-
-    body = {"id": id, "token": token}  # include parsed variables to POST request body
-    headers = {'content-type': 'application/json'}
-    r = locust.post('/app/post_endpoint', body, headers, catch_response=True)  # call app-specific POST endpoint
-    content = r.content.decode('utf-8')
-    if 'assertion string after successful POST request' not in content:
-        logger.error(f"'assertion string after successful POST request' was not found in {content}")
-    assert 'assertion string after successful POST request' in content  # assertion after POST request
+    userName = locust.session_data_storage["username"]
+    logger.info(f"'get_ecr_credentials() called for user {userName} ...")
+    path = "/rest/identity-federation-for-aws/2.2/connectors/" + FIRST_CONNECTOR + "/ecr/credentials"
+    r = locust.get(path, catch_response=True)  # call app-specific GET endpoint
+    logger.info(f"'... locust.get() returned status code {r.status_code} ...")
+    
+    assert r.status_code == 200, f"expected GET .../credentials 200, got {r.status_code}"
