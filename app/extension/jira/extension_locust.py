@@ -1,6 +1,5 @@
 import re
-from app.locustio.common_utils import raise_if_login_failed
-from locustio.common_utils import init_logger, jira_measure, run_as_specific_user  # noqa F401
+from locustio.common_utils import init_logger, jira_measure, run_as_specific_user, raise_if_login_failed  # noqa F401
 from util.conf import JIRA_SETTINGS
 
 logger = init_logger(app_type='jira')
