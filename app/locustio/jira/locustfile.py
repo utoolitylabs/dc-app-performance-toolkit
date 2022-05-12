@@ -67,7 +67,7 @@ class JiraBehavior(MyBaseTaskSet):
     # def custom_action(self):
     #     app_specific_action(self)
 
-    @task(config.percentage('standalone_extension_locust'))
+    @task(config.percentage('standalone_extension'))
     def custom_action_get_temporary_credential(self):
         # KLUDGE: The terraform based Bamboo setup uses the default 30min session timeout,
         # and the locust instrumentation of the toolkit does not cater for the thus unavoidable 403/401 responses
@@ -77,7 +77,7 @@ class JiraBehavior(MyBaseTaskSet):
         # locust_bamboo_login(self)
         app_specific_action_get_temporary_credential(self)
 
-    @task(config.percentage('standalone_extension_locust'))
+    @task(config.percentage('standalone_extension'))
     def custom_action_get_ecr_credential(self):
         # KLUDGE: The terraform based Bamboo setup uses the default 30min session timeout,
         # and the locust instrumentation of the toolkit does not cater for the thus unavoidable 403/401 responses
