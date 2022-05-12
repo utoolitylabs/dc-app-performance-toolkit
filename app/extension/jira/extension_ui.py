@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 
 from selenium_ui.base_page import BasePage
 from selenium_ui.conftest import print_timing
-from selenium_ui.jira.pages.pages import Login, ProjectsList
+from selenium_ui.jira.pages.pages import Login, Dashboard
 from util.conf import JIRA_SETTINGS
 
 
@@ -43,31 +43,31 @@ def app_specific_action(webdriver, datasets):
     #     sub_measure()
     # measure()
     
-    projectlist_page = ProjectsList(webdriver)
+    dashboard_page = Dashboard(webdriver)
 
     @print_timing("selenium_app_ui_connector_menu")
     def measure():
         # NOTE: Kept extensive per line exception detection/logging in case we run into issues again, as it should not matter for normal test execution
         try:
-            projectlist_page.go_to()
+            dashboard_page.go_to()
         except Exception:
             # https://docs.python.org/2/library/sys.html#sys.exc_info
             exc_type, full_exception = sys.exc_info()[:2]
-            error_msg = f"Failed projectlist_page.go_to(): {exc_type.__name__}"
+            error_msg = f"Failed dashboard_page.go_to(): {exc_type.__name__}"
             raise Exception(error_msg, full_exception)
         try:
-            projectlist_page.wait_until_clickable((By.ID, "ifaws-aws-resources-link")).click()  # Wait for connector menu trigger
+            dashboard_page.wait_until_clickable((By.ID, "ifaws-aws-resources-link")).click()  # Wait for connector menu trigger
         except Exception:
             # https://docs.python.org/2/library/sys.html#sys.exc_info
             exc_type, full_exception = sys.exc_info()[:2]
-            error_msg = f"Failed projectlist_page.wait_until_clickable(): {exc_type.__name__}"
+            error_msg = f"Failed dashboard_page.wait_until_clickable(): {exc_type.__name__}"
             raise Exception(error_msg, full_exception)
         try:
-            projectlist_page.wait_until_visible((By.CSS_SELECTOR, "a[title='Go to AWS connector configuration page']"))  # Wait for connector menu visible
+            dashboard_page.wait_until_visible((By.CSS_SELECTOR, "a[title='Go to AWS connector configuration page']"))  # Wait for connector menu visible
         except Exception:
             # https://docs.python.org/2/library/sys.html#sys.exc_info
             exc_type, full_exception = sys.exc_info()[:2]
-            error_msg = f"Failed projectlist_page.wait_until_visible(): {exc_type.__name__}"
+            error_msg = f"Failed dashboard_page.wait_until_visible(): {exc_type.__name__}"
             raise Exception(error_msg, full_exception)
     measure()
 
