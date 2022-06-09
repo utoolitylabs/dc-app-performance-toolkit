@@ -1,34 +1,45 @@
+import random
 import re
-from locustio.common_utils import init_logger, jira_measure, run_as_specific_user, raise_if_login_failed  # noqa F401
+from locustio.jira.requests_params import Login, BrowseIssue, CreateIssue, SearchJql, ViewBoard, BrowseBoards, \
+    BrowseProjects, AddComment, ViewDashboard, EditIssue, ViewProjectSummary, jira_datasets
+from locustio.common_utils import jira_measure, fetch_by_re, timestamp_int, generate_random_string, TEXT_HEADERS, \
+    ADMIN_HEADERS, NO_TOKEN_HEADERS, RESOURCE_HEADERS, init_logger, raise_if_login_failed
+
 from util.conf import JIRA_SETTINGS
+import uuid
 
 logger = init_logger(app_type='jira')
+jira_dataset = jira_datasets()
 FIRST_CONNECTOR = JIRA_SETTINGS.ifaws_connector_id
 
-# NOTE: Quite a deviation from the original sample, but that would not cater for multiple custom actions without changes to dc toolkit core logic,
-# hence starting with on custom action invoking multiple measurements in itself (to be revised if results are not satisfactory)
-# @run_as_specific_user(username='admin', password='admin')
-@jira_measure("locust_app_api_get_temporary_credentials")
-def app_specific_action_get_temporary_credential(locust):
-    raise_if_login_failed(locust)
-    
-    userName = locust.session_data_storage["username"]
-    logger.info(f"'get_temporary_credentials() called for user {userName} ...")
-    path = "/rest/identity-federation-for-aws/2.2/connectors/" + FIRST_CONNECTOR + "/credentials"
-    r = locust.get(path, catch_response=True)  # call app-specific GET endpoint
-    logger.info(f"'... locust.get() returned status code {r.status_code} ...")
-    
-    assert r.status_code == 200, f"expected GET .../credentials 200, got {r.status_code}"
-    
-    
-@jira_measure("locust_app_api_get_ecr_credentials")
-def app_specific_action_get_ecr_credential(locust):
-    raise_if_login_failed(locust)
+def app_specific_action_invoke_aws_api_action(locust):
+    params = CreateIssue()
+    project = random.choice(jira_dataset['projects'])
+    project_id = project[1]
 
-    userName = locust.session_data_storage["username"]
-    logger.info(f"'get_ecr_credentials() called for user {userName} ...")
-    path = "/rest/identity-federation-for-aws/2.2/connectors/" + FIRST_CONNECTOR + "/ecr/credentials"
-    r = locust.get(path, catch_response=True)  # call app-specific GET endpoint
-    logger.info(f"'... locust.get() returned status code {r.status_code} ...")
-    
-    assert r.status_code == 200, f"expected GET .../credentials 200, got {r.status_code}"
+    @jira_measure("locust_app_invoke_aws_api_action")
+    def create_issue_submit_form():
+        raise_if_login_failed(locust)
+        issue_body = params.prepare_issue_body(locust.session_data_storage['issue_body_params_dict'],
+                                               user=locust.session_data_storage["username"])
+
+        # 215 /secure/QuickCreateIssue.jspa?decorator=none
+        r = locust.post('/secure/QuickCreateIssue.jspa?decorator=none',
+                        params=issue_body,
+                        headers=ADMIN_HEADERS,
+                        catch_response=True)
+
+        # 220 /rest/analytics/1.0/publish/bulk
+        locust.post('/rest/analytics/1.0/publish/bulk',
+                    json=params.resources_body.get("220"),
+                    headers=RESOURCE_HEADERS,
+                    catch_response=True)
+
+        content = r.content.decode('utf-8')
+        if '"id":"project","label":"Project"' not in content:
+            logger.error(f'{params.err_message_create_issue}: {content}')
+        assert '"id":"project","label":"Project"' in content, params.err_message_create_issue
+        issue_key = fetch_by_re(params.create_issue_key_pattern, content)
+        logger.locust_info(f"{params.action_name}: Issue {issue_key} was successfully created")
+
+    create_issue_submit_form()
