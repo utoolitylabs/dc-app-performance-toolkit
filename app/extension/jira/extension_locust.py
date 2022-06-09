@@ -14,7 +14,10 @@ FIRST_CONNECTOR = JIRA_SETTINGS.ifaws_connector_id
 
 def app_specific_action_invoke_aws_api_action(locust):
     params = CreateIssue()
-    project = random.choice(jira_dataset['projects'])
+    # NOTE: Can't use the random project choice here, as this would need adjustments of all used workflows, hence pinnig just one well known
+    # project = random.choice(jira_dataset['projects'])
+    # TODO: Adjust/verify - must be a valid project, and the one with the workflow adjusted to use our AAWS action
+    project = ["VLLR","10359"]
     project_id = project[1]
 
     @jira_measure("locust_app_invoke_aws_api_action")
