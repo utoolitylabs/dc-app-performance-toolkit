@@ -3,7 +3,7 @@ from locustio.jira.http_actions import login_and_view_dashboard, create_issue, s
     view_project_summary, view_dashboard, edit_issue, add_comment, browse_boards, view_kanban_board, view_scrum_board, \
     view_backlog, browse_projects
 from locustio.common_utils import LocustConfig, MyBaseTaskSet
-from extension.jira.extension_locust import app_specific_action_get_ecr_credential, app_specific_action_get_temporary_credential
+from extension.jira.extension_locust import app_specific_action_invoke_aws_api_action
 from util.conf import JIRA_SETTINGS
 
 config = LocustConfig(config_yml=JIRA_SETTINGS)
@@ -68,25 +68,14 @@ class JiraBehavior(MyBaseTaskSet):
     #     app_specific_action(self)
 
     @task(config.percentage('standalone_extension'))
-    def custom_action_get_temporary_credential(self):
+    def custom_action_invoke_aws_api_action(self):
         # KLUDGE: The terraform based Bamboo setup uses the default 30min session timeout,
         # and the locust instrumentation of the toolkit does not cater for the thus unavoidable 403/401 responses
         # starting after 30min - this should be fixed either in the Bamboo test instance itself,
         # or by improved login/-out handling in the toolkit, but to get test results for now,
         # we accept the overhead of a dedicated login per custom action REST call
         # locust_bamboo_login(self)
-        app_specific_action_get_temporary_credential(self)
-
-    @task(config.percentage('standalone_extension'))
-    def custom_action_get_ecr_credential(self):
-        # KLUDGE: The terraform based Bamboo setup uses the default 30min session timeout,
-        # and the locust instrumentation of the toolkit does not cater for the thus unavoidable 403/401 responses
-        # starting after 30min - this should be fixed either in the Bamboo test instance itself,
-        # or by improved login/-out handling in the toolkit, but to get test results for now,
-        # we accept the overhead of a dedicated login per custom action REST call
-        # locust_bamboo_login(self)
-        app_specific_action_get_ecr_credential(self)
-
+        app_specific_action_invoke_aws_api_action(self)
 
 class JiraUser(HttpUser):
     host = JIRA_SETTINGS.server_url
