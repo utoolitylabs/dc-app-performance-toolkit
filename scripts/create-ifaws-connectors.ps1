@@ -1,5 +1,5 @@
 param (
-    [string]$targetBaseUrl = "https://bamboo.ifaws-1573-20220223-1.tst.utoolity.net",
+    [Parameter(Mandatory,HelpMessage='targetBaseUrl')][string]$targetBaseUrl,
     [Parameter(Mandatory,HelpMessage='accessKeyId')][string]$accessKeyId,
     [Parameter(Mandatory,HelpMessage='secretAccessKey')][string]$secretAccessKey,
     [Parameter(Mandatory,HelpMessage='numAccounts')][int]$numAccounts,
