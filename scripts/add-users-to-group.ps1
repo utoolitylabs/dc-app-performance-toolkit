@@ -2,7 +2,7 @@ param (
     [string]$targetBaseUrl = "https://bamboo.ifaws-1573-20220216-1.tst.utoolity.net",
     [string]$groupName = "performance-user",
     [string]$user = "admin",
-    [string]$pass = $( Read-Host "Enter host instance password" )
+    [Parameter(Mandatory,HelpMessage='Enter host instance password')][string]$pass
 )
 
 $sessionName = [guid]::NewGuid().toString()
