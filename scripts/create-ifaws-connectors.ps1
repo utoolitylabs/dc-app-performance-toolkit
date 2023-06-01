@@ -56,7 +56,7 @@ $connectorTemplate = @"
     "externalId": "",
     "iamPolicy": "",
     "groups": [
-        "performance-user"
+        "jira-software-users"
     ]
 }
 "@
