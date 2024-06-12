@@ -26,7 +26,9 @@ def app_specific_action_invoke_aws_api_action(locust):
         raise_if_login_failed(locust)
 
         # 200 /secure/QuickCreateIssue!default.jspa?decorator=none
-        r = locust.post('/secure/QuickCreateIssue!default.jspa?decorator=none', ADMIN_HEADERS, catch_response=True)
+        r = locust.post('/secure/QuickCreateIssue!default.jspa',
+                        json={'atlassian.xsrf.token': locust.session_data_storage["token"]},
+                        headers=ADMIN_HEADERS, catch_response=True)
 
         content = r.content.decode('utf-8')
         atl_token = fetch_by_re(params.atl_token_pattern, content)
@@ -52,7 +54,7 @@ def app_specific_action_invoke_aws_api_action(locust):
         # 205 /rest/quickedit/1.0/userpreferences/create
         locust.post('/rest/quickedit/1.0/userpreferences/create',
                     json=params.user_preferences_payload,
-                    headers=ADMIN_HEADERS,
+                    headers=RESOURCE_HEADERS,
                     catch_response=True)
 
         # 210 /rest/analytics/1.0/publish/bulk
@@ -73,6 +75,7 @@ def app_specific_action_invoke_aws_api_action(locust):
 
         # 215 /secure/QuickCreateIssue.jspa?decorator=none
         r = locust.post('/secure/QuickCreateIssue.jspa?decorator=none',
+                        json={'atlassian.xsrf.token': locust.session_data_storage["token"]},
                         params=issue_body,
                         headers=ADMIN_HEADERS,
                         catch_response=True)
